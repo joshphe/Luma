@@ -1,0 +1,16 @@
+.compare-view { position: relative; width: 100%; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: #303338; }
+.compare-pane { min-width: 0; height: 100%; margin: 0; display: flex; flex-direction: column; background: #111317; }
+.compare-pane figcaption { height: 48px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid #292c30; color: #e5e5e3; font-size: 12px; }
+.compare-pane figcaption small { color: #62656a; font-size: 9px; letter-spacing: .12em; }
+.result-pane figcaption span { color: var(--accent); }
+.compare-image-wrap { min-height: 0; flex: 1; display: grid; place-items: center; padding: 22px; overflow: hidden; }
+.compare-image-wrap img { display: block; max-width: 100%; max-height: min(56vh, 650px); object-fit: contain; border-radius: 4px; box-shadow: 0 25px 70px #0009; transition: filter .12s; }
+.compare-divider { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #4b4e53; border-radius: 50%; background: #191b1f; color: var(--accent); font-size: 13px; box-shadow: 0 8px 24px #0008; }
+@media (max-width: 620px) {
+  .image-stage.has-image { min-height: 620px; }
+  .compare-view { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+  .compare-pane figcaption { height: 38px; }
+  .compare-image-wrap { padding: 12px; }
+  .compare-image-wrap img { max-height: 235px; }
+  .compare-divider { transform: translate(-50%, -50%) rotate(90deg); }
+}
