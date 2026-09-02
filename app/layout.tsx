@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './compare.css';
 import './enhance.css';
+import './split.css';
 
 export const metadata: Metadata = {
   title: 'Luma · 本地图片工作台',
