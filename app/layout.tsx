@@ -5,6 +5,7 @@ import './enhance.css';
 import './split.css';
 import './collage.css';
 import './notification-template.css';
+import './payout-template.css';
 
 export const metadata: Metadata = {
   title: 'Luma · 本地图片工作台',

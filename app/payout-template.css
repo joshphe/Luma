@@ -1,0 +1,15 @@
+.payouts-stage{flex:1;min-height:0;display:grid;place-items:center;padding:10px 0 22px}
+.payouts-preview{width:min(100%,480px);overflow:hidden;background:#000;box-shadow:0 24px 70px #0007}
+.payouts-preview img{display:block;width:100%;height:auto}
+.payouts-placeholder{min-height:480px;display:grid;place-items:center;padding:30px;color:#8b8f95;text-align:center;font-size:13px}
+.payouts-hint{margin:-5px 0 22px;color:#8b8f95;font-size:11px;line-height:1.7}
+.payouts-record-heading,.payouts-record-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px}
+.payouts-record-heading{margin-bottom:12px}.payouts-record-heading span{color:#8b8f95;font-variant-numeric:tabular-nums}
+.payouts-records{display:grid;gap:10px}.payouts-record{padding:13px;border:1px solid #30343a;border-radius:10px;background:#191c20}
+.payouts-record-top{margin-bottom:12px;color:#a5a7aa}.payouts-record-top button{padding:0;border:0;background:none;color:#9b9fa6;font-size:10px;cursor:pointer}
+.payouts-record-top button:disabled{opacity:.3;cursor:not-allowed}.payouts-record .notice-field{margin-bottom:0}.payouts-record-date{margin-top:9px;color:#8b8f95;font-size:11px}
+.payouts-add{margin:12px 0 0;padding:11px;border:1px dashed #454a50;border-radius:9px;background:transparent;color:#caff5b;font-size:12px;cursor:pointer}
+.payouts-add:disabled{opacity:.35;cursor:not-allowed}.payouts-add:focus-visible,.payouts-record-top button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.payouts-total{display:grid;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid #30343a}.payouts-total span{color:#8b8f95;font-size:11px}.payouts-total strong{font-size:25px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.payouts-panel .collage-message:empty{display:none}.payouts-panel .export-wrap{padding-top:20px}
+@media(max-width:620px){.payouts-preview{width:min(100%,400px)}.payouts-placeholder{min-height:380px}.payouts-stage{padding-top:0}.payouts-area .stage-footer{gap:12px;font-size:10px}}

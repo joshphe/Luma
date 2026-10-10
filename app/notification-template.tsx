@@ -1,10 +1,15 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
+import PayoutTemplate from './payout-template';
 
 const WIDTH = 2048;
 const HEIGHT = 552;
 const FONT = 'Arial, "PingFang SC", "Microsoft YaHei", sans-serif';
+// Fixed artwork from the supplied reference, independent of the device's emoji font.
+const ICON = { src: '/notification-party-popper.png', width: 88, height: 84 };
+const ICON_SIZE = 128;
 
 function downloadCanvas(canvas: HTMLCanvasElement) {
   const link = document.createElement('a');
@@ -14,64 +19,88 @@ function downloadCanvas(canvas: HTMLCanvasElement) {
 }
 
 export default function NotificationTemplate() {
+  const [category, setCategory] = useState('notice');
+  const [payoutAmounts, setPayoutAmounts] = useState(['1749.19', '850.20']);
+  const [payoutDate, setPayoutDate] = useState('2026-10-09');
   const [hours, setHours] = useState('2');
   const [amount, setAmount] = useState('1589.9');
   const [currency, setCurrency] = useState('美元');
   const [message, setMessage] = useState('');
+  const [exporting, setExporting] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const safeHours = hours.trim() || '0';
   const safeAmount = amount.trim() || '0';
 
-  const exportImage = () => {
+  const exportImage = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const context = canvas.getContext('2d');
     if (!context) return;
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
-    context.fillStyle = '#ffffff';
-    context.fillRect(0, 0, WIDTH, HEIGHT);
-    context.strokeStyle = '#eceef0';
-    context.lineWidth = 2;
-    context.beginPath();
-    context.moveTo(0, 155);
-    context.lineTo(WIDTH, 155);
-    context.moveTo(0, 470);
-    context.lineTo(WIDTH, 470);
-    context.stroke();
+    setExporting(true);
+    setMessage('');
+    try {
+      // Wait for the fixed asset before drawing; a failed load must not export an empty icon.
+      const icon = new window.Image();
+      icon.src = ICON.src;
+      await icon.decode();
+      canvas.width = WIDTH;
+      canvas.height = HEIGHT;
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, WIDTH, HEIGHT);
+      context.strokeStyle = '#eceef0';
+      context.lineWidth = 2;
+      context.beginPath();
+      context.moveTo(0, 155);
+      context.lineTo(WIDTH, 155);
+      context.moveTo(0, 470);
+      context.lineTo(WIDTH, 470);
+      context.stroke();
 
-    context.textBaseline = 'alphabetic';
-    context.font = `108px ${FONT}`;
-    context.fillText('🎉', 102, 315);
-    context.font = `76px ${FONT}`;
-    context.fillStyle = '#17191f';
-    context.fillText('你收到钱了！', 330, 300);
-    context.font = `64px ${FONT}`;
-    context.fillStyle = '#5d6471';
-    context.fillText(`· ${safeHours}小时`, 833, 297);
+      context.textBaseline = 'alphabetic';
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = 'high';
+      context.drawImage(icon, 96, 208, ICON_SIZE, ICON_SIZE * ICON.height / ICON.width);
+      context.font = `76px ${FONT}`;
+      context.fillStyle = '#17191f';
+      context.fillText('你收到钱了！', 330, 300);
+      context.font = `64px ${FONT}`;
+      context.fillStyle = '#5d6471';
+      context.fillText(`· ${safeHours}小时`, 833, 297);
 
-    const detail = `${safeAmount} ${currency}已被存入你的账号。`;
-    let detailSize = 70;
-    context.font = `${detailSize}px ${FONT}`;
-    while (context.measureText(detail).width > 1500 && detailSize > 42) {
-      detailSize -= 2;
+      const detail = `${safeAmount} ${currency}已被存入你的账号。`;
+      let detailSize = 70;
       context.font = `${detailSize}px ${FONT}`;
-    }
-    context.fillStyle = '#5d6471';
-    context.fillText(detail, 330, 412);
+      while (context.measureText(detail).width > 1500 && detailSize > 42) {
+        detailSize -= 2;
+        context.font = `${detailSize}px ${FONT}`;
+      }
+      context.fillStyle = '#5d6471';
+      context.fillText(detail, 330, 412);
 
-    context.fillStyle = '#f1f2f3';
-    context.beginPath();
-    context.roundRect(1652, 184, 300, 56, 14);
-    context.fill();
-    context.font = `700 27px ${FONT}`;
-    context.fillStyle = '#656b75';
-    context.textAlign = 'center';
-    context.fillText('示例 · 非真实凭证', 1802, 221);
-    context.textAlign = 'start';
-    downloadCanvas(canvas);
-    setMessage('已导出 2048 × 552 PNG');
+      context.fillStyle = '#f1f2f3';
+      context.beginPath();
+      context.roundRect(1652, 184, 300, 56, 14);
+      context.fill();
+      context.font = `700 27px ${FONT}`;
+      context.fillStyle = '#656b75';
+      context.textAlign = 'center';
+      context.fillText('示例 · 非真实凭证', 1802, 221);
+      context.textAlign = 'start';
+      downloadCanvas(canvas);
+      setMessage('已导出 2048 × 552 PNG');
+    } catch {
+      setMessage('导出失败，请检查图标是否加载成功后重试。');
+    } finally {
+      setExporting(false);
+    }
   };
+
+  const categoryField = <label className="notice-field"><span>通知类别</span><select value={category}
+    onChange={(event) => setCategory(event.target.value)}><option value="notice">收款通知</option>
+    <option value="payouts">Original Content Rewards</option></select></label>;
+
+  if (category === 'payouts') return <PayoutTemplate categoryField={categoryField} amounts={payoutAmounts}
+    latestDate={payoutDate} onAmountsChange={setPayoutAmounts} onDateChange={setPayoutDate} />;
 
   return <>
     <section className="canvas-area notice-area">
@@ -80,7 +109,7 @@ export default function NotificationTemplate() {
         <div className="notice-preview" role="img" aria-label={`演示通知：${safeAmount} ${currency}，${safeHours}小时`}>
           <div className="notice-demo-mark">示例 · 非真实凭证</div>
           <div className="notice-line top" />
-          <div className="notice-icon" aria-hidden="true">🎉</div>
+          <Image className="notice-icon" src={ICON.src} width={ICON.width} height={ICON.height} alt="" aria-hidden="true" unoptimized />
           <div className="notice-copy"><div className="notice-title"><strong>你收到钱了！</strong><span>· {safeHours}小时</span></div><div className="notice-detail">{safeAmount} {currency}已被存入你的账号。</div></div>
           <div className="notice-line bottom" />
         </div>
@@ -90,12 +119,13 @@ export default function NotificationTemplate() {
     </section>
     <aside className="filter-panel notice-panel">
       <div className="panel-title"><div><span className="eyebrow">TEMPLATE</span><h2>通知模板</h2></div><span className="secure-dot">✓</span></div>
+      {categoryField}
       <div className="notice-safety"><strong>演示用途</strong><p>生成结果固定带有“非真实凭证”标识，适合产品原型和内容演示。</p></div>
       <label className="notice-field"><span>时间（小时）</span><input inputMode="decimal" maxLength={8} value={hours} onChange={(event) => setHours(event.target.value.replace(/[^0-9.]/g, ''))} placeholder="2" /></label>
       <label className="notice-field"><span>金额</span><input inputMode="decimal" maxLength={16} value={amount} onChange={(event) => setAmount(event.target.value.replace(/[^0-9.,]/g, ''))} placeholder="1589.9" /></label>
       <label className="notice-field"><span>货币</span><select value={currency} onChange={(event) => setCurrency(event.target.value)}><option>美元</option><option>人民币</option><option>欧元</option><option>英镑</option><option>日元</option><option>港币</option></select></label>
-      {message ? <div className="collage-message">{message}</div> : null}
-      <div className="export-wrap"><button className="export-button" onClick={exportImage}>导出演示 PNG <span>↓</span></button><p>无需 AI · 无接口费用 · 本地生成</p></div>
+      {message ? <div className="collage-message" role="status">{message}</div> : null}
+      <div className="export-wrap"><button className="export-button" onClick={exportImage} disabled={exporting}>{exporting ? '正在导出…' : '导出演示 PNG'} <span>↓</span></button><p>无需 AI · 无接口费用 · 本地生成</p></div>
     </aside>
   </>;
 }

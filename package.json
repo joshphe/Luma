@@ -10,7 +10,8 @@
     "dev": "npm run build:worker && next dev",
     "build": "npm run build:worker && next build",
     "start": "next start",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "test:payouts": "node scripts/test-payouts.mjs"
   },
   "dependencies": {
     "next": "16.2.6",
